@@ -6,8 +6,9 @@ import type {
   INode,
 } from 'n8n-workflow';
 import { NodeOperationError } from 'n8n-workflow';
-import { createPublicClient, http, type Abi } from 'viem';
+import { type Abi } from 'viem';
 import { parseAbi, serializeForN8n, getCallableFunctions } from '../utils/evm';
+import { createEthereumClient } from '../utils/ethereum-rpc';
 
 export class EvmReadContract implements INodeType {
   description: INodeTypeDescription = {
@@ -21,16 +22,13 @@ export class EvmReadContract implements INodeType {
     },
     inputs: ['main'],
     outputs: ['main'],
-    credentials: [],
-    properties: [
+    credentials: [
       {
-        displayName: 'RPC URL',
-        name: 'rpcUrl',
-        type: 'string',
-        default: '',
+        name: 'ethereumRpcApi',
         required: true,
-        description: 'HTTPS RPC endpoint of the EVM network',
       },
+    ],
+    properties: [
       {
         displayName: 'Contract Address',
         name: 'contractAddress',
@@ -79,7 +77,6 @@ export class EvmReadContract implements INodeType {
       async getFunctions(this: ILoadOptionsFunctions) {
         try {
           const abiParam = this.getNodeParameter('abi', 0) as string;
-          console.log({abiParam});
           const parsedAbi = parseAbi(abiParam, this.getNode());
 
           const functions = getCallableFunctions(parsedAbi);
@@ -102,7 +99,6 @@ export class EvmReadContract implements INodeType {
     const results = [] as Array<{ success: boolean; data: any; error: string | null }>;
 
     for (let i = 0; i < items.length; i++) {
-      const rpcUrl = this.getNodeParameter('rpcUrl', i) as string;
       const contractAddress = this.getNodeParameter('contractAddress', i) as string;
       const abiParam = this.getNodeParameter('abi', i) as string;
       const functionName = this.getNodeParameter('functionName', i) as string;
@@ -135,9 +131,7 @@ export class EvmReadContract implements INodeType {
       }
 
       try {
-        const client = createPublicClient({
-          transport: http(rpcUrl),
-        });
+        const client = await createEthereumClient(this, this.getNode());
 
         const rawData = await client.readContract({
           address: contractAddress as `0x${string}`,

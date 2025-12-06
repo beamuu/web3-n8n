@@ -1,14 +1,9 @@
-import type {
-  IExecuteFunctions,
-  ILoadOptionsFunctions,
-  INodeType,
-  INodeTypeDescription,
-} from 'n8n-workflow';
+import type { IExecuteFunctions, INodeType, INodeTypeDescription } from 'n8n-workflow';
 import { NodeOperationError } from 'n8n-workflow';
-import { createPublicClient, http } from 'viem';
 import { ERC20_ABI } from '../utils/erc20';
 import { getCallableFunctions } from '../utils/abi';
 import { serializeForN8n } from '../utils/serialization';
+import { createEthereumClient } from '../utils/ethereum-rpc';
 
 const ERC20_OPTIONS = getCallableFunctions(ERC20_ABI as any).map((fn: any) => ({
   name: fn.name,
@@ -28,16 +23,13 @@ export class EvmErc20Read implements INodeType {
     },
     inputs: ['main'],
     outputs: ['main'],
-    credentials: [],
-    properties: [
+    credentials: [
       {
-        displayName: 'RPC URL',
-        name: 'rpcUrl',
-        type: 'string',
-        default: '',
+        name: 'ethereumRpcApi',
         required: true,
-        description: 'HTTPS RPC endpoint of the EVM network',
       },
+    ],
+    properties: [
       {
         displayName: 'Token Address',
         name: 'contractAddress',
@@ -74,7 +66,6 @@ export class EvmErc20Read implements INodeType {
     const results = [] as Array<{ success: boolean; data: any; error: string | null }>;
 
     for (let i = 0; i < items.length; i++) {
-      const rpcUrl = this.getNodeParameter('rpcUrl', i) as string;
       const contractAddress = this.getNodeParameter('contractAddress', i) as string;
       const functionName = this.getNodeParameter('functionName', i) as string;
       const functionArgsRaw = this.getNodeParameter('functionArgs', i, '') as string;
@@ -101,9 +92,7 @@ export class EvmErc20Read implements INodeType {
       }
 
       try {
-        const client = createPublicClient({
-          transport: http(rpcUrl),
-        });
+        const client = await createEthereumClient(this, this.getNode());
 
         const rawData = await client.readContract({
           address: contractAddress as `0x${string}`,

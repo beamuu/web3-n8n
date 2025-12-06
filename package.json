@@ -10,7 +10,11 @@
   "n8n": {
     "nodes": [
       "dist/nodes/EvmReadContract.node.js",
-      "dist/nodes/EvmErc20Read.node.js"
+      "dist/nodes/EvmErc20Read.node.js",
+      "dist/nodes/EthereumRpc.node.js"
+    ],
+    "credentials": [
+      "dist/credentials/EthereumRpcApi.credentials.js"
     ]
   },
   "scripts": {
