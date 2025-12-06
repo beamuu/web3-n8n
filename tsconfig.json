@@ -9,9 +9,19 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "moduleResolution": "node",
-    "types": ["node"],
+    "types": [
+      "node",
+      "bun-types"
+    ],
     "skipLibCheck": true
   },
-  "include": ["nodes/**/*.ts", "index.ts"],
-  "exclude": ["dist", "node_modules"]
+  "include": [
+    "nodes/**/*.ts",
+    "index.ts",
+    "utils/**/*.ts"
+  ],
+  "exclude": [
+    "dist",
+    "node_modules"
+  ]
 }
