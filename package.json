@@ -1,0 +1,22 @@
+{
+  "name": "n8n-nodes-evm-read",
+  "version": "0.1.0",
+  "description": "n8n custom node for read-only EVM contract calls",
+  "keywords": ["n8n", "evm", "blockchain", "viem"],
+  "author": "",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "lint": "echo 'No lint configured'"
+  },
+  "dependencies": {
+    "n8n-workflow": "^1.20.0",
+    "viem": "^2.10.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "typescript": "^5.4.0"
+  }
+}

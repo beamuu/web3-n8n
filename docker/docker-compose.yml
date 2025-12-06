@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      - GENERIC_TIMEZONE=UTC
+      # Uncomment and adjust if you want basic auth on the n8n UI
+      # - N8N_BASIC_AUTH_ACTIVE=true
+      # - N8N_BASIC_AUTH_USER=admin
+      # - N8N_BASIC_AUTH_PASSWORD=changeme
+    volumes:
+      - n8n_data:/home/node/.n8n
+      # Mount the custom node package into n8n's custom nodes directory
+      - ../:/home/node/.n8n/custom
+    # Uncomment and customize if you want to override the default base URL
+    # environment:
+    #   - WEBHOOK_URL=https://example.com/
+
+volumes:
+  n8n_data:
